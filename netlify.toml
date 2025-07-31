@@ -1,47 +1,66 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  environment = { NODE_VERSION = "18" }
+  functions = "functions"
 
 [build.environment]
-  VITE_APP_ENV = "production"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[context.production]
-  environment = { VITE_APP_ENV = "production" }
-
-[context.deploy-preview]
-  environment = { VITE_APP_ENV = "preview" }
-
-[context.branch-deploy]
-  environment = { VITE_APP_ENV = "branch" }
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000"
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = """
-      default-src 'self';
-      script-src 'self' 'unsafe-inline';
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      font-src 'self' https://fonts.gstatic.com;
-      img-src 'self' data:;
-      connect-src 'self';
-    """
-
-[[plugins]]
-  package = "@netlify/plugin-lighthouse"
+  NODE_VERSION = "18"
+  VITE_SUPABASE_URL = ""
+  VITE_SUPABASE_ANON_KEY = ""
+  VITE_APP_TITLE = "Fast Track Cleaning"
+  VITE_APP_DESCRIPTION = "Professional, reliable, and affordable cleaning with a 7-day re-clean guarantee."
+  VITE_ENV = "production"
 
 [dev]
   command = "npm run dev"
   port = 3000
   targetPort = 3000
   autoLaunch = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+
+[[edge_functions]]
+  path = "/api/*"
+  function = "api"
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
